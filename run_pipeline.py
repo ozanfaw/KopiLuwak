@@ -1,21 +1,19 @@
 """
 Kopi Luwak Sentiment Analysis Pipeline
 ========================================
-Consolidated from 8 Jupyter notebooks into a single executable script.
-
 Stages:
-  1. Ingest & language stratification (from 01_ingest_and_language.ipynb)
-  2. Cleaning & normalization       (from 02_cleaning.ipynb)
-  3. Keyword backfill               (from 03_keyword_backfill.ipynb)
-  4. Dual-stream sentiment scoring  (from 04_features_and_sentiment.ipynb)
-  5. Intent + stance classification (from 05_intent_and_stance.ipynb)
+  1. Ingest & language stratification 
+  2. Cleaning & normalization       
+  3. Keyword backfill               
+  4. Dual-stream sentiment scoring 
+  5. Intent + stance classification 
 
 Output:
   outputs/final/stance_labeled_dataset.csv
 
 Usage:
   1. Ensure the `luwak` package is installed (pip install -e .)
-  2. Place raw Excel file at data/raw/kopi_luwak_5tahun_master.xlsx
+  2. Place raw Excel file at data/raw/dataset.xlsx
   3. Run: python run_pipeline.py
 """
 
