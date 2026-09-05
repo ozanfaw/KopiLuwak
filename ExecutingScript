@@ -1,0 +1,49 @@
+How to Hydrate the Dataset
+To reconstruct the dataset, you will need an active X Developer Account and API Bearer Token.
+
+1. Ensure you have Python installed along with the `tweepy` and `pandas` libraries:
+   ```bash
+   pip install tweepy pandas
+   ```
+2. Run the provided script or utilize the X API `GET /2/tweets` endpoint to fetch the text and metadata for the IDs listed in `dataset_ids.csv`.
+3. Note: IDs corresponding to posts that have been deleted, suspended, or set to private by the author since our original collection period will return an error or an empty object, in accordance with platform privacy requirements.
+
+## Citation
+If you use this dataset in your research, please cite our manuscript
+
+import pandas as pd
+import tweepy
+import time
+
+df = pd.read_csv('dataset.csv')
+tweet_ids = df['post_id'].tolist()
+
+BEARER_TOKEN = "YOUR_X_API_BEARER_TOKEN"
+client = tweepy.Client(bearer_token=BEARER_TOKEN)
+
+hydrated_data = []
+
+for i in range(0, len(tweet_ids), 100):
+    batch = tweet_ids[i:i+100]
+    try:
+        response = client.get_tweets(ids=batch, tweet_fields=['created_at', 'text', 'author_id'])
+        if response.data:
+            for tweet in response.data:
+                hydrated_data.append({
+                    'post_id': tweet.id,
+                    'text': tweet.text,
+                    'author_id': tweet.author_id,
+                    'created_at': tweet.created_at
+                })
+    except tweepy.TooManyRequests:
+        wait = int(response.headers.get('x-rate-limit-reset', time.time() + 900))
+        sleep_time = max(wait - int(time.time()), 60)
+        print(f"Rate limited. Sleeping {sleep_time}s...")
+        time.sleep(sleep_time)
+    except Exception as e:
+        print(f"Error at batch {i}: {e}")
+    time.sleep(1)
+
+output_df = pd.DataFrame(hydrated_data)
+output_df.to_csv('hydrated_dataset.csv', index=False)
+print(f"Done. {len(hydrated_data)} tweets saved.")
